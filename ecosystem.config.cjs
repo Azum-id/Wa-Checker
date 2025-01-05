@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'Whatsapp Checker',
-      script: '/root/wa/index.js',
+      script: './index.js',
       instances: 1,
       autorestart: true,
       watch: false,
