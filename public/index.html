@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Number Checker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .wrapper {
+      background: #fff;
+      padding: 20px 25px;
+      border-radius: 8px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      width: 350px;
+      text-align: center;
+    }
+
+    .wrapper header h1 {
+      font-size: 22px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .wrapper section p {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 20px;
+    }
+
+    .wrapper footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer input {
+      flex: 1;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-right: 10px;
+      font-size: 14px;
+    }
+
+    footer button {
+      padding: 8px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    footer button:hover {
+      background-color: #0056b3;
+    }
+
+    #responseMessage {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <section class="wrapper">
+    <div class="content">
+      <header>
+        <h1>WhatsApp Number Checker</h1>
+      </header>
+      <section>
+        <p>Check if a phone number is registered on WhatsApp.</p>
+      </section>
+      <footer>
+        <input type="text" id="number" placeholder="Enter phone number">
+        <button type="submit" id="checkButton">Check</button>
+      </footer>
+      <div id="responseMessage"></div>
+    </div>
+  </section>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#checkButton').on('click', function () {
+        const number = $('#number').val().trim();
+        $('#responseMessage').html('');
+
+        if (!number) {
+          $('#responseMessage').html('<p style="color: red;">Please enter a phone number.</p>');
+          return;
+        }
+
+        $.ajax({
+          url: '/check-number',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ number }),
+          success: function (response) {
+            if (response.success) {
+              $('#responseMessage').html(`
+                <p style="color: green;">
+                  Number is ${response.data.exists ? 'registered' : 'not registered'} on WhatsApp.<br>
+                  ${response.data.exists ? `JID: ${response.data.jid}` : ''}
+                </p>
+              `);
+            } else {
+              $('#responseMessage').html(`<p style="color: orange;">${response.message}</p>`);
+            }
+          },
+          error: function (xhr) {
+            let message = 'An unexpected error occurred.';
+            if (xhr.status === 503) {
+              message = 'WhatsApp is not connected.';
+            }
+            $('#responseMessage').html(`<p style="color: red;">${message}</p>`);
+          },
+        });
+      });
+    });
+  </script>
+</body>
+</html>

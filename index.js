@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import fs from "fs";
 import pino from "pino";
 import chalk from "chalk";
@@ -95,6 +96,10 @@ connectToWhatsApp();
 const app = express();
 app.use(express.json());
 
+// Set folder public untuk melayani file statis
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, "public")));
+
 const jsonResponse = (res, status, success, message, data = null) => {
   res.status(status).json({
     success,
@@ -102,6 +107,10 @@ const jsonResponse = (res, status, success, message, data = null) => {
     data,
   });
 };
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/index.html"));
+});
 
 app.post("/check-number", async (req, res) => {
   const { number } = req.body;
